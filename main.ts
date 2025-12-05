@@ -17,7 +17,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         `, kočka, směrX, směrY)
-    pause(200)
+    pause(500)
 })
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function () {
     nepřítelživoty += -1
@@ -71,6 +71,9 @@ let nepřítel = sprites.create(img`
 nepřítel.setPosition(129, 100)
 let nepřítelživoty = 10
 let rychlost = 0
+game.showLongText("Tvým cílem je zabít nepřítel", DialogLayout.Bottom)
+game.showLongText("Můžeš na něj střílet ohnivé koule", DialogLayout.Bottom)
+game.showLongText("Ale pozor, bude tě čím dál rychleji pronásledovat!", DialogLayout.Bottom)
 forever(function () {
     if (kočka.overlapsWith(nepřítel)) {
         info.changeLifeBy(-1)
