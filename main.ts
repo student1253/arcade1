@@ -1,9 +1,34 @@
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Player, function (sprite, otherSprite) {
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    projectile = sprites.createProjectileFromSprite(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 4 4 . . . . . . . 
+        . . . . . . 4 5 5 4 . . . . . . 
+        . . . . . . 2 5 5 2 . . . . . . 
+        . . . . . . . 2 2 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, kočka, směrX, směrY)
+    pause(200)
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function () {
 	
 })
+let směrY = 0
+let směrX = 0
 let projectile: Sprite = null
+let kočka: Sprite = null
 tiles.setCurrentTilemap(tilemap`level1`)
-let mySprite = sprites.create(img`
+scene.cameraFollowSprite(kočka)
+kočka = sprites.create(img`
     e e e . . . . e e e . . . . 
     c d d c . . c d d c . . . . 
     c b d d f f d d b c . . . . 
@@ -19,58 +44,67 @@ let mySprite = sprites.create(img`
     . f d f f f d f f d f . . . 
     . f f . . f f . . f f . . . 
     `, SpriteKind.Player)
-controller.moveSprite(mySprite, 100, 100)
-let mySprite2 = sprites.create(img`
-    ........................
-    .....ffff...............
-    ...fff22fff.............
-    ..fff2222fff............
-    .fffeeeeeefff...........
-    .ffe222222eef...........
-    .fe2ffffff2ef...........
-    .ffffeeeeffff...........
-    ffefbf44fbfeff..........
-    fee41fddf14eef..........
-    .ffffdddddeef...........
-    fddddf444eef............
-    fbbbbf2222f4e...........
-    fbbbbf2222fd4...........
-    .fccf45544f44...........
-    ..ffffffff..............
-    ....ff..ff..............
-    ........................
-    ........................
-    ........................
-    ........................
-    ........................
-    ........................
-    ........................
-    `, SpriteKind.Enemy)
-mySprite2.follow(mySprite, 50)
+kočka.setPosition(44, 47)
 info.setScore(0)
 info.setLife(3)
-scene.cameraFollowSprite(mySprite)
-mySprite.setPosition(44, 47)
-mySprite2.setPosition(149, 47)
+controller.moveSprite(kočka, 100, 100)
+let nepřítel = sprites.create(img`
+    . . . . . f f 4 4 f f . . . . . 
+    . . . . f 5 4 5 5 4 5 f . . . . 
+    . . . f e 4 5 5 5 5 4 e f . . . 
+    . . f b 3 e 4 4 4 4 e 3 b f . . 
+    . . f 3 3 3 3 3 3 3 3 3 3 f . . 
+    . f 3 3 e b 3 e e 3 b e 3 3 f . 
+    . f 3 3 f f e e e e f f 3 3 f . 
+    . f b b f b f e e f b f b b f . 
+    . f b b e 1 f 4 4 f 1 e b b f . 
+    f f b b f 4 4 4 4 4 4 f b b f f 
+    f b b f f f e e e e f f f b b f 
+    . f e e f b d d d d b f e e f . 
+    . . e 4 c d d d d d d c 4 e . . 
+    . . e f b d b d b d b b f e . . 
+    . . . f f 1 d 1 d 1 d f f . . . 
+    . . . . . f f b b f f . . . . . 
+    `, SpriteKind.Enemy)
+nepřítel.setPosition(129, 100)
+let nepřítelživoty = 10
+let rychlost = 0
 forever(function () {
-    if (controller.B.isPressed()) {
-        projectile = sprites.createProjectileFromSprite(img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . 4 4 . . . . . . . 
-            . . . . . . 4 5 5 4 . . . . . . 
-            . . . . . . 2 5 5 2 . . . . . . 
-            . . . . . . . 2 2 . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `, mySprite, 0, 0)
+    if (kočka.overlapsWith(nepřítel)) {
+        info.changeLifeBy(-1)
+        pause(500)
+    }
+    if (nepřítelživoty == 0) {
+        game.gameOver(true)
+    }
+    if (info.life() == 0) {
+        game.gameOver(false)
+    }
+})
+forever(function () {
+    if (controller.up.isPressed()) {
+        směrY = -100
+        směrX = 0
+    }
+})
+forever(function () {
+    if (controller.down.isPressed()) {
+        směrY = 100
+        směrX = 0
+    }
+})
+forever(function () {
+	
+})
+forever(function () {
+    if (controller.left.isPressed()) {
+        směrY = 0
+        směrX = -100
+    }
+})
+forever(function () {
+    if (controller.right.isPressed()) {
+        směrY = 0
+        směrX = 100
     }
 })
