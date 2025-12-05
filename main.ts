@@ -1,4 +1,4 @@
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     projectile = sprites.createProjectileFromSprite(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -20,14 +20,16 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     pause(200)
 })
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function () {
-	
+    nepřítelživoty += -1
+    rychlost += 10
+    info.changeScoreBy(1)
+    pause(200)
 })
 let směrY = 0
 let směrX = 0
 let projectile: Sprite = null
 let kočka: Sprite = null
 tiles.setCurrentTilemap(tilemap`level1`)
-scene.cameraFollowSprite(kočka)
 kočka = sprites.create(img`
     e e e . . . . e e e . . . . 
     c d d c . . c d d c . . . . 
@@ -94,17 +96,18 @@ forever(function () {
     }
 })
 forever(function () {
-	
-})
-forever(function () {
-    if (controller.left.isPressed()) {
-        směrY = 0
-        směrX = -100
-    }
+    nepřítel.follow(kočka, rychlost)
+    scene.cameraFollowSprite(kočka)
 })
 forever(function () {
     if (controller.right.isPressed()) {
         směrY = 0
         směrX = 100
+    }
+})
+forever(function () {
+    if (controller.left.isPressed()) {
+        směrY = 0
+        směrX = -100
     }
 })
